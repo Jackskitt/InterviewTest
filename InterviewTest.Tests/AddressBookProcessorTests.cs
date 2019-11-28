@@ -55,5 +55,28 @@ namespace InterviewTest.Tests
             var processor = new AddressBookProcessor(addressBook);
             await Assert.ThrowsAsync<AddressBookException>(() => processor.GetAmountOfMales());
         }
+
+        [Fact]
+        public async Task FETCH_OLDEST_PERSON_EXPECT_CHUCK_JACKSON()
+        {
+            var mockConfig = new Mock<IConfiguration>();
+            mockConfig.Setup(x => x["BookLocation"]).Returns(projectDirectory + "/Data/AddressBook");
+
+            var addressBook = new AddressBookStore(mockLogger, mockConfig.Object);
+            var processor = new AddressBookProcessor(addressBook);
+            var oldestPerson = await processor.FetchOldestPerson();
+            Assert.Equal("Chuck Jackson", oldestPerson.Name);
+        }
+
+        [Fact]
+        public async Task GET_OLDEST_PERSON_EXPECT_EXCEPTION()
+        {
+            var mockConfig = new Mock<IConfiguration>();
+            mockConfig.Setup(x => x["BookLocation"]).Returns(projectDirectory + "/Data/NOBOOK");
+
+            var addressBook = new AddressBookStore(mockLogger, mockConfig.Object);
+            var processor = new AddressBookProcessor(addressBook);
+            await Assert.ThrowsAsync<AddressBookException>(() => processor.FetchOldestPerson());
+        }
     }
 }
