@@ -2,11 +2,9 @@
 using InterviewTest.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace InterviewTest.Services.Implementations
@@ -25,8 +23,7 @@ namespace InterviewTest.Services.Implementations
         {
             this.logger = logger;
             this.configuration = configuration;
-            var projectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent;
-            bookLocation = projectDirectory + configuration["BookLocation"];
+            bookLocation = configuration["BookLocation"];
         }
 
         /// <summary>
@@ -36,8 +33,8 @@ namespace InterviewTest.Services.Implementations
         /// <returns>default or Person[]</returns>
         public async Task<IEnumerable<Person>> GetAddressBook()
         {
-            
-            if(AddressBook == default(IEnumerable<Person>))
+
+            if (AddressBook == default(IEnumerable<Person>))
             {
                 if (HasLoaded)
                     return default(IEnumerable<Person>);
@@ -49,7 +46,7 @@ namespace InterviewTest.Services.Implementations
             }
 
             return AddressBook;
-                
+
         }
 
         /// <summary>
@@ -73,11 +70,15 @@ namespace InterviewTest.Services.Implementations
 
         /// <summary>
         /// Load the address book from a file line by line and then proccesses the line into people
+        /// Were not doing the processing here and storing it, because that's boring and not much of a test
         /// </summary>
         /// <returns></returns>
         public async Task LoadAddressBook()
         {
             var personsTask = new List<Task<Person>>();
+            if (!File.Exists(bookLocation))
+                return;
+
             using (var addressBookStream = new StreamReader(bookLocation))
             {
                 while (!addressBookStream.EndOfStream)

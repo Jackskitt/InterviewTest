@@ -22,6 +22,7 @@ namespace InterviewTest
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSingleton<IAddressBookStore, AddressBookStore>();
+            services.AddScoped<IAddressBookProcessor, AddressBookProcessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

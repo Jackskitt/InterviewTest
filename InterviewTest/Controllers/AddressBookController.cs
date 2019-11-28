@@ -1,45 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using InterviewTest.Models;
+using InterviewTest.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
 namespace InterviewTest.Controllers
 {
-    [Route("/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AddressBookController : ControllerBase
     {
-        // GET api/values
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        private readonly IAddressBookProcessor addressBookProcessor;
+        private readonly ILogger<AddressBookController> logger;
+
+        public AddressBookController(IAddressBookProcessor addressBookProcessor, ILogger<AddressBookController> logger)
         {
-            return new string[] { "value1", "value2" };
+            this.addressBookProcessor = addressBookProcessor;
+            this.logger = logger;
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        [HttpGet("AmountOfMales")]
+        public async Task<IActionResult> GetAmountOfMales()
         {
-            return "value";
-        }
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            try
+            {
+                var maleCount = await addressBookProcessor.GetAmountOfMales();
+                return Ok(maleCount);
+            }
+            catch (AddressBookException)
+            {
+                return BadRequest("We've couldn't load the address book");
+            }
+            catch (Exception e)
+            {
+                logger.LogCritical(e, e.Message);
+                throw;
+            }
         }
     }
 }
