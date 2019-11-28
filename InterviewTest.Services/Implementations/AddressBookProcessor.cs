@@ -73,7 +73,7 @@ namespace InterviewTest.Services.Implementations
             if (toComparePersonObject == default(Person))
                 return new PersonAgeDifferenceResponse($"{toComparePerson} does not exist in the database");
 
-            var difference = toComparePersonObject.Dob -firstPersonObject.Dob;
+            var difference = toComparePersonObject.Dob - firstPersonObject.Dob;
             return new PersonAgeDifferenceResponse(difference.Days, person, toComparePerson);
         }
     }
