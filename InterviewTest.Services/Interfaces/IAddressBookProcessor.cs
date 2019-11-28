@@ -1,4 +1,5 @@
 ﻿using InterviewTest.Models;
+using InterviewTest.Models.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,5 +12,7 @@ namespace InterviewTest.Services.Interfaces
         Task<int> GetAmountOfMales();
 
         Task<Person> FetchOldestPerson();
+
+        Task<PersonAgeDifferenceResponse> GetAgeDifference(string person, string toComparePerson);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using InterviewTest.Models;
+using InterviewTest.Models.Dtos;
 using InterviewTest.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,28 @@ namespace InterviewTest.Services.Implementations
             var addressBook = await LoadAddressBook();
 
             return addressBook.Count(x => x.Gender.Equals("Male"));
+        }
+
+        /// <summary>
+        /// Gets the age difference in days between two people
+        /// Bill and Paul don't exist in the database i'm 90% certain this is on purpose, so it will return a message if the users don't exist
+        /// </summary>
+        /// <param name="person"></param>
+        /// <param name="toComparePerson"></param>
+        /// <returns></returns>
+        public async Task<PersonAgeDifferenceResponse> GetAgeDifference(string person, string toComparePerson)
+        {
+            var addressBook = await LoadAddressBook();
+            var firstPersonObject = addressBook.FirstOrDefault(x => x.Name == person);
+            if (firstPersonObject == default(Person))
+                return new PersonAgeDifferenceResponse($"{person} does not exist in the database");
+
+            var toComparePersonObject = addressBook.FirstOrDefault(x => x.Name == toComparePerson);
+            if (toComparePersonObject == default(Person))
+                return new PersonAgeDifferenceResponse($"{toComparePerson} does not exist in the database");
+
+            var difference = toComparePersonObject.Dob -firstPersonObject.Dob;
+            return new PersonAgeDifferenceResponse(difference.Days, person, toComparePerson);
         }
     }
 }

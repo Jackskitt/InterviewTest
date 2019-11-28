@@ -78,5 +78,72 @@ namespace InterviewTest.Tests
             var processor = new AddressBookProcessor(addressBook);
             await Assert.ThrowsAsync<AddressBookException>(() => processor.FetchOldestPerson());
         }
+
+        [Fact]
+        public async Task GET_DIFFERENCE_BETWEEN_TWO_EXISTING_PEOPLE_EXPECT_YOUNGER()
+        {
+            var mockConfig = new Mock<IConfiguration>();
+            mockConfig.Setup(x => x["BookLocation"]).Returns(projectDirectory + "/Data/AddressBook");
+
+            var addressBook = new AddressBookStore(mockLogger, mockConfig.Object);
+            var processor = new AddressBookProcessor(addressBook);
+            var ageDifference = await processor.GetAgeDifference("John Snow", "Chuck Jackson");
+            Assert.True(ageDifference.IsSuccessful);
+            Assert.Equal(-945, ageDifference.Difference);
+            Assert.Equal("John Snow is 945 days younger than Chuck Jackson", ageDifference.Message);
+        }
+
+        [Fact]
+        public async Task GET_DIFFERENCE_BETWEEN_TWO_EXISTING_PEOPLE_EXPECT_OLDER()
+        {
+            var mockConfig = new Mock<IConfiguration>();
+            mockConfig.Setup(x => x["BookLocation"]).Returns(projectDirectory + "/Data/AddressBook");
+
+            var addressBook = new AddressBookStore(mockLogger, mockConfig.Object);
+            var processor = new AddressBookProcessor(addressBook);
+            var ageDifference = await processor.GetAgeDifference("Chuck Jackson", "John Snow");
+            Assert.True(ageDifference.IsSuccessful);
+            Assert.Equal(945, ageDifference.Difference);
+            Assert.Equal("Chuck Jackson is 945 days older than John Snow", ageDifference.Message);
+        }
+
+        [Fact]
+        public async Task GET_DIFFERENCE_BETWEEN_PEOPLE_FIRST_MISSING_PERSON_EXPECT_FAILURE()
+        {
+            var mockConfig = new Mock<IConfiguration>();
+            mockConfig.Setup(x => x["BookLocation"]).Returns(projectDirectory + "/Data/AddressBook");
+
+            var addressBook = new AddressBookStore(mockLogger, mockConfig.Object);
+            var processor = new AddressBookProcessor(addressBook);
+            var ageDifference = await processor.GetAgeDifference("Bob the Builder","John Snow");
+            Assert.False(ageDifference.IsSuccessful);
+            Assert.Equal("Bob the Builder does not exist in the database", ageDifference.Message);
+        }
+
+        [Fact]
+        public async Task GET_DIFFERENCE_BETWEEN_PEOPLE_SECOND_MISSING_PERSON_EXPECT_FAILURE()
+        {
+            var mockConfig = new Mock<IConfiguration>();
+            mockConfig.Setup(x => x["BookLocation"]).Returns(projectDirectory + "/Data/AddressBook");
+
+            var addressBook = new AddressBookStore(mockLogger, mockConfig.Object);
+            var processor = new AddressBookProcessor(addressBook);
+            var ageDifference = await processor.GetAgeDifference("John Snow","Bob the Builder");
+            Assert.False(ageDifference.IsSuccessful);
+            Assert.Equal("Bob the Builder does not exist in the database", ageDifference.Message);
+        }
+
+        [Fact]
+        public async Task GET_DIFFERENCE_BETWEEN_PEOPLE_BOTH_MISSING_PERSON_EXPECT_FAILURE()
+        {
+            var mockConfig = new Mock<IConfiguration>();
+            mockConfig.Setup(x => x["BookLocation"]).Returns(projectDirectory + "/Data/AddressBook");
+
+            var addressBook = new AddressBookStore(mockLogger, mockConfig.Object);
+            var processor = new AddressBookProcessor(addressBook);
+            var ageDifference = await processor.GetAgeDifference("Ted", "Bob the Builder");
+            Assert.False(ageDifference.IsSuccessful);
+            Assert.Equal("Ted does not exist in the database", ageDifference.Message);
+        }
     }
 }

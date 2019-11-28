@@ -65,5 +65,39 @@ namespace InterviewTest.Controllers
                 throw;
             }
         }
+
+        /// <summary>
+        /// Compares two people by name to fetch the age difference
+        /// </summary>
+        /// <param name="firstPerson">Person you want to check the difference</param>
+        /// <param name="toCompare">Who to compare to </param>
+        /// <returns>A human readable message</returns>
+        [HttpGet("GetAgeDifference")]
+        public async Task<IActionResult> GetAgeDifference([FromQuery] string firstPerson, [FromQuery] string toCompare)
+        {
+            if (string.IsNullOrEmpty(firstPerson))
+                return BadRequest("Please enter a name for the first person");
+
+            if (string.IsNullOrEmpty(toCompare))
+                return BadRequest("Please enter a name for the second person");
+
+            try
+            {
+                var ageDifferenceResult = await addressBookProcessor.GetAgeDifference(firstPerson, toCompare);
+                if (ageDifferenceResult.IsSuccessful)
+                    return Ok(ageDifferenceResult.Message);
+
+                return BadRequest(ageDifferenceResult.Message);
+            }
+            catch (AddressBookException)
+            {
+                return BadRequest("We've couldn't load the address book");
+            }
+            catch (Exception e)
+            {
+                logger.LogCritical(e, e.Message);
+                throw;
+            }
+        }
     }
 }
